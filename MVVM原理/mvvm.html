@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body></body>
+
+  <script>
+    const data = {
+      a: 1,
+      b: "str",
+      c: { d: 1 }
+    };
+    observer(data);
+    data.c.d = 5;
+    function observer(data) {
+      for (let key in data) {
+        let val = data[key];
+        const dep = new Dep();
+        if (typeof data[key] === "object") {
+          observer(data[key]);
+        }
+        Object.defineProperty(data, key, {
+          configurable: false,
+          enumerable: true,
+          get() {
+            return val;
+          },
+          set(newval) {
+            console.log(newval, val);
+            val = newval;
+            dep.notify();
+          }
+        });
+      }
+    }
+
+    class Dep {
+      constructor() {
+        this.subs = [];
+      }
+      addSub(sub) {
+        this.subs.push(sub);
+      }
+      notify() {
+        this.subs.forEach(sub => {
+          sub.update();
+        });
+      }
+    }
+    // function observer(data) {
+    //   if (!data || typeof data !== "object") return;
+    //   for (let key in data) {
+    //     observerProperty(data, key, data[key]);
+    //   }
+    // }
+    // function observerProperty(data, key, val) {
+    //   observer(val);
+    //   Object.defineProperty(data, key, {
+    //     configurable: false,
+    //     enumerable: true,
+    //     get() {
+    //       return val;
+    //     },
+    //     set(newval) {
+    //       if (val === newval) return;
+    //       val = newval;
+    //     }
+    //   });
+    // }
+
+    console.log(data);
+  </script>
+</html>
